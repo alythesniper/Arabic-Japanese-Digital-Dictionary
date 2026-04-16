@@ -6,12 +6,32 @@ import zipfile
 import re
 
 def create_yomitan_zip(dictionary_name):
+    '''
+    Create the yomitan dictionary zip file in the working directory named the dictionary name.
+    Expects the file structure created by create_term_bank_files() and must be ran in the parent directory
+    of the directory created by create_term_bank_files().
+    
+    Args:
+        dictionary_name (str): Name of the dictionary.
+
+    Returns:
+        bool: failed or succeeded
+    '''
     files = os.listdir(f'./{dictionary_name}')
     with zipfile.ZipFile(f'{dictionary_name}.zip', 'w', zipfile.ZIP_DEFLATED) as zipf:
         for file in files:
             zipf.write(f'./{dictionary_name}/' + file, arcname=file)
 
 def create_tag_bank(dictionary_name):
+    '''
+    Create tag bank file in a subfolder of the working directory named the dictionary name.
+    
+    Args:
+        dictionary_name (str): Name of the dictionary.
+
+    Returns:
+        bool: failed or succeeded
+    '''
     tag_bank = [
         [
             "v",
@@ -30,9 +50,19 @@ def create_tag_bank(dictionary_name):
     ]
     with open(f"{dictionary_name}\\tag_bank_1.json", "w+", encoding='utf-8') as file:
         json.dump(tag_bank, file, ensure_ascii=False, indent=4)
+    
+    return True
 
 def crate_index_file(dictionary_name):
-    # Create index.json file 
+    '''
+    Create index.json file in a subfolder of the working directory named the dictionary name.
+    
+    Args:
+        dictionary_name (str): Name of the dictionary.
+
+    Returns:
+        bool: failed or succeeded
+    '''
     date = str(datetime.datetime.now().date()).replace("-", ".", 3)
 
     index_file = {
@@ -52,6 +82,8 @@ def crate_index_file(dictionary_name):
     }
     with open(f"{dictionary_name}\\index.json", "w+", encoding='utf-8') as file:
         json.dump(index_file, file, ensure_ascii=False, indent=4)
+    
+    return True
 
 def create_term_bank_files(dictionary_name, dictionary_array):
     '''
@@ -75,6 +107,8 @@ def create_term_bank_files(dictionary_name, dictionary_array):
         chunk = dictionary_array[i:i + chunk_size]
         with open(f"{dictionary_name}\\term_bank_{file_count}.json", "w+", encoding='utf-8') as file:
             json.dump(chunk, file, ensure_ascii=False, indent=4)
+    
+    return True
 
 # POS classes
 noun_classes = ["【名】","【形】","【数】","【代】","【人代】","【関代】","【関副】","【不定代名詞】","【人名】","【名扱い】","【複】","【双】","【序】","【定冠詞】","【名［ⅣM］】","【ⅡM】","【Ⅷ M】","【Ⅷ】","【Ⅵ】","【Ⅴ】","【Ⅹ】","【Ⅹ受分】","【形】","細身の"]
