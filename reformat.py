@@ -146,36 +146,46 @@ with open("./Dictionary Data/ar-ja-middle.csv", "r", encoding='utf-16') as file:
             headword = raw_entry[0]
             defenition = raw_entry[1]
 
-            # Remove all non arabic letter + kashida (ـ)
-            headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652]", "", headword)
+            # Remove all non arabic letter + kashida (ـ), leaves '-' & ',' characters
+            headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D\u002C]", "", headword)
         # If reading present
         else:
             headword = raw_entry[0]
             defenition = raw_entry[1]
             reading = raw_entry[6]
 
-            # Remove all non arabic letter + kashida (ـ), leave ' ' & '-' characters
+            # Remove all non arabic letter + kashida (ـ), leaves '-' & ',' characters
             if '例文' in defenition:
-                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D]", "", headword)
-                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D]", "", reading)
+                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D\u002C]", "", headword)
+                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D\u002C]", "", reading)
                 example_sentence_count += 1
             elif '表現' in defenition:
-                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D]", "", headword)
-                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D]", "", reading)
+                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D\u002C]", "", headword)
+                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u0020\u002D\u002C]", "", reading)
                 phrase_count += 1
             else:
-                # Remove all non arabic letter + kashida (ـ), leaves '-' character
-                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u002D]", "", headword)
-                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u002D]", "", reading)     
+                # Remove all non arabic letter + kashida (ـ), leaves '-' & ',' characters
+                headword = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u002D\u002C]", "", headword)
+                reading = re.sub(r"[^\u0621-\u063A\u0641-\u064A\u064B-\u0652\u002D\u002C]", "", reading)     
 
             # Scan reading for '-', then substring up to it
             seperator_index = -1
             try:
                 seperator_index = reading.index('-')
+                # Remove whitespace before seperator
+                if reading[seperator_index-1] == ' ':
+                    seperator_index -= 1
                 reading = reading[0:seperator_index]
             except ValueError:
-                seperator_index = -1
-                reading = reading[0:]
+                try:
+                    seperator_index = reading.index(',')
+                    # Remove whitespace before seperator
+                    if reading[seperator_index-1] == ' ':
+                        seperator_index -= 1
+                    reading = reading[0:seperator_index]
+                except ValueError:
+                    seperator_index = -1
+                    reading = reading[0:]
 
             # Scan headword for '-', then substring up to it
             seperator_index = -1
@@ -186,8 +196,17 @@ with open("./Dictionary Data/ar-ja-middle.csv", "r", encoding='utf-16') as file:
                     seperator_index -= 1
                 headword = headword[0:seperator_index]
             except ValueError:
-                seperator_index = -1
-                headword = headword[0:]
+                try:
+                    seperator_index = headword.index(',')
+                    # Remove whitespace before seperator
+                    if headword[seperator_index-1] == ' ':
+                        seperator_index -= 1
+                    headword = headword[0:seperator_index]
+                except ValueError:
+                    seperator_index = -1
+                    headword = headword[0:]
+
+
         
         # Reconstruct POS marker before getting POS
         try:
@@ -208,7 +227,7 @@ with open("./Dictionary Data/ar-ja-middle.csv", "r", encoding='utf-16') as file:
 
         # Get word tags
         word_tags = word_class
-
+       
         # Construct entry
         yomitan_entry = [
             headword,                   # Expression (term) 0
