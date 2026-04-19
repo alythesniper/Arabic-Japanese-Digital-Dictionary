@@ -70,7 +70,7 @@ def crate_index_file(dictionary_name):
     "revision": date,
     "sequenced": True,
     "format": 3,
-    "author": "Al-ard",
+    "author": "Al-Ard",
     "indexUrl": "",
     "downloadUrl": "",
     "url": "https://www.arabic-japanese.com/",
